@@ -46,7 +46,7 @@ export default function Header({
     <header>
       <Navbar>
         <Navbar.Brand>
-          <Logo /> Sultan Almohammadi Crypto Course
+          <Logo /> Sultan almuhammadi Crypto Course
         </Navbar.Brand>
         <div className="nav-buttons">
           {!isNil(sound) ? (

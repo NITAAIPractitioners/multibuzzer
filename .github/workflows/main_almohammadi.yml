@@ -57,6 +57,7 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'almuhammadi'      # <-- EXACT Azure app name here
+          app-name: 'almuhammadi-erg8ewcyeaere9cc'      # <-- EXACT Azure app name here
           slot-name: 'Production'
           package: .
+

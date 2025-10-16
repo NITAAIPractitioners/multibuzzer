@@ -23,29 +23,30 @@ jobs:
       - name: Install deps
         run: npm ci || npm install
 
-      # --- EITHER keep this quick build (warnings won't fail) ---
+      # CRA warnings (like react-hooks/exhaustive-deps) won't fail CI
       - name: Build (don’t fail on warnings)
         env:
           CI: false
           ESLINT_NO_DEV_ERRORS: true
         run: npm run build --if-present
 
-      # --- OR use strict steps below instead of the quick build above ---
-      # - name: Build
-      #   run: npm run build --if-present
-      #
+      # Optional: run tests without hanging CI (won’t fail deploy if they warn)
       # - name: Test (CI-friendly)
       #   run: npm test -- --watchAll=false
 
+      # Upload only what Azure needs; include build/ so it can be served
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          # TIP: narrow what you upload (avoid uploading the whole repo)
           path: |
             build
             package.json
             package-lock.json
+            pnpm-lock.yaml
+            yarn.lock
+            # if you have a Node server, include it (uncomment the next line):
+            # server.js
 
   deploy:
     runs-on: ubuntu-latest
@@ -68,10 +69,9 @@ jobs:
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C9311B13B5C14DC6A063F5564177D972 }}
 
       - name: Deploy to Azure Web App
+        id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'almuhammadi'
           slot-name: 'Production'
-          # If you built a CRA/static app, deploying the /build folder is typical:
-          package: ./build
-          # If you're deploying a Node server, adjust to your server artifact instead.
+          package: .

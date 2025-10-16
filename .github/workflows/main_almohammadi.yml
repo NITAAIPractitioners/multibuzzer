@@ -1,4 +1,4 @@
-name: Build and deploy Node.js app to Azure Web App - almohammadi
+name: Build & deploy (almuhammadi)
 
 on:
   push:
@@ -10,7 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-
     steps:
       - uses: actions/checkout@v4
 
@@ -23,13 +22,14 @@ jobs:
       - name: Install deps
         run: npm ci || npm install
 
+      # Avoid CRA turning warnings into errors
       - name: Build (don’t fail on warnings)
         env:
           CI: false
           ESLINT_NO_DEV_ERRORS: true
         run: npm run build --if-present
 
-      - name: Upload artifact for deployment job
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: node-app
@@ -41,7 +41,6 @@ jobs:
     permissions:
       id-token: write
       contents: read
-
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
@@ -58,6 +57,6 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'almohammadi'
+          app-name: 'almuhammadi'      # <-- EXACT Azure app name here
           slot-name: 'Production'
           package: .

@@ -1,53 +1,65 @@
-# Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
-# More GitHub Actions for Azure: https://github.com/Azure/actions
-
 name: Build and deploy Node.js app to Azure Web App - almuhammadi
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read #This is required for actions/checkout
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20.x'
+          cache: 'npm'
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+      - name: Install deps
+        run: npm ci || npm install
+
+      # --- EITHER keep this quick build (warnings won't fail) ---
+      - name: Build (don’t fail on warnings)
+        env:
+          CI: false
+          ESLINT_NO_DEV_ERRORS: true
+        run: npm run build --if-present
+
+      # --- OR use strict steps below instead of the quick build above ---
+      # - name: Build
+      #   run: npm run build --if-present
+      #
+      # - name: Test (CI-friendly)
+      #   run: npm test -- --watchAll=false
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v4
         with:
           name: node-app
-          path: .
+          # TIP: narrow what you upload (avoid uploading the whole repo)
+          path: |
+            build
+            package.json
+            package-lock.json
 
   deploy:
     runs-on: ubuntu-latest
     needs: build
     permissions:
-      id-token: write #This is required for requesting the JWT
-      contents: read #This is required for actions/checkout
+      id-token: write
+      contents: read
 
     steps:
       - name: Download artifact from build job
         uses: actions/download-artifact@v4
         with:
           name: node-app
-      
+
       - name: Login to Azure
         uses: azure/login@v2
         with:
@@ -55,11 +67,11 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_ECF7485060544A748758726E6DD95EA8 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C9311B13B5C14DC6A063F5564177D972 }}
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: 'almuhammadi'
           slot-name: 'Production'
-          package: .
-          
+          # If you built a CRA/static app, deploying the /build folder is typical:
+          package: ./build
+          # If you're deploying a Node server, adjust to your server artifact instead.

@@ -51,16 +51,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_A00E7A662E0245EC828F5D63D6FA8D82 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_AC811E41A6BC4033AF2DC5E5186BEF76 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7DC7FB76174747A983BC02A3B08D72F8 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_7C0B371A68E942079045EA778F6C13AD }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_ECF7485060544A748758726E6DD95EA8 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_C9311B13B5C14DC6A063F5564177D972 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'almuhammadi-erg8ewcyeaere9cc'
+          app-name: 'almuhammadi'
           slot-name: 'Production'
           package: .
-
           

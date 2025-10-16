@@ -52,7 +52,7 @@ jobs:
         with:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6B603D7ABEDF42A0A82B5567AA75DFE4 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_15E5B0CD31974BC7988720685E89BFBB }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_08E969811A0C42C6A818E38DA304806C }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_e4e356ee-a58a-4bbe-aba2-ef02de61fa95 }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
@@ -60,4 +60,5 @@ jobs:
           app-name: 'almuhammadi-erg8ewcyeaere9cc'      # <-- EXACT Azure app name here
           slot-name: 'Production'
           package: .
+
 

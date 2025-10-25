@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { get, some, values, sortBy, orderBy, isEmpty, round } from 'lodash';
 import { Howl } from 'howler';
 import { AiOutlineDisconnect } from 'react-icons/ai';
@@ -16,22 +16,29 @@ export default function Table(game) {
   const buzzButton = useRef(null);
   const queueRef = useRef(null);
 
-  const buzzSound = new Howl({
-    src: [
-      `${process.env.PUBLIC_URL}/shortBuzz.webm`,
-      `${process.env.PUBLIC_URL}/shortBuzz.mp3`,
-    ],
-    volume: 0.5,
-    rate: 1.5,
-  });
+  // Make the Howl instance stable across renders
+  const buzzSound = useMemo(
+    () =>
+      new Howl({
+        src: [
+          `${process.env.PUBLIC_URL}/shortBuzz.webm`,
+          `${process.env.PUBLIC_URL}/shortBuzz.mp3`,
+        ],
+        volume: 0.5,
+        rate: 1.5,
+      }),
+    []
+  );
 
-  const playSound = () => {
+  // Stable playSound that reflects current sound/soundPlayed
+  const playSound = useCallback(() => {
     if (sound && !soundPlayed) {
       buzzSound.play();
       setSoundPlayed(true);
     }
-  };
+  }, [sound, soundPlayed, buzzSound]);
 
+  // React to queue changes; list all values we read/call as deps
   useEffect(() => {
     console.log(game.G.queue, Date.now());
     // reset buzzer based on game
@@ -62,7 +69,7 @@ export default function Table(game) {
     }
 
     queueRef.current = game.G.queue;
-  }, [game.G.queue]);
+  }, [game.G.queue, loaded, lastBuzz, game.playerID, playSound]);
 
   const attemptBuzz = () => {
     if (!buzzed) {
